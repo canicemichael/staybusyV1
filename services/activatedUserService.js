@@ -5,7 +5,7 @@ const ActiveUser = require("../models/activatedUser");
 const CustomError = require("../helpers/CustomError");
 
 class ActivatedUsersService {
-  async completeUserProfile(data) {
+  async completeUserProfile(data, userId) {
     const user = await User.findOne({ _id: userId });
     if (!user) throw new CustomError("User doesn't exist", 404); // if the ID used as parameter is invalid
 
