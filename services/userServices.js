@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const CustomError = require("../helpers/CustomError");
 const config = require("../config/auth.config");
-const nodemailer = require("nodemailer");
+const nodemailer = require("../config/nodemailer.config");
 
 class UsersService {
   async signupUser(data) {
@@ -18,15 +18,15 @@ class UsersService {
 
     const token = await jwt.sign({ email: data.email }, config.secret);
 
-    const user = new User(data, (data.confirmationCode = token));
+    const user = new User({
+      email: data.email,
+      password: data.password,
+      confirmationCode: token,
+    });
 
-    await user.save(
-      nodemailer.sendConfirmationEmail(
-        user.username,
-        user.email,
-        user.confirmationCode
-      )
-    );
+    await user.save(() => {
+      nodemailer.sendConfirmationEmail(user.email, user.confirmationCode);
+    });
 
     return token;
   }
