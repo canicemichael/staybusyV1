@@ -2,30 +2,38 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require("bcrypt");
 
-const UserSchema = new Schema(
+const ActivatedUserSchema = new Schema(
   {
     fullname: {
       type: String,
       required: [true, "field name is required"],
     },
-    phone: {
+    location: {
       type: String,
-      required: [true, "phone is required"],
-    },
-    email: {
-      type: String,
-      required: [true, "email is required"],
     },
     alternative_email: {
       type: String,
-      required: [true, "email is required"],
+      required: [true, "alternative mail is required"],
     },
-    password: {
+    phone_number: {
       type: String,
-      required: [true, "password is required"],
+      required: [true, "phone number is required"],
     },
-    location: {
+    country: {
       type: String,
+      required: [true, "country is required"],
+    },
+    prefered_currency: {
+      type: String,
+      required: [true, "please provide your prefered currency"],
+    },
+    city: {
+      type: String,
+      required: [true, "city is required"],
+    },
+    periodAvailable: {
+      type: String,
+      required: [true, "period of availability is required"],
     },
     imgUrl: {
       type: String,
@@ -51,7 +59,7 @@ const UserSchema = new Schema(
   }
 );
 
-UserSchema.pre("save", async function (next) {
+ActivatedUserSchema.pre("save", async function (next) {
   try {
     const saltRounds = 10;
     let hash = await bcrypt.hash(this.password, saltRounds);
@@ -62,4 +70,4 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-module.exports = mongoose.model("VerifiedUsers", VerifiedUserSchema);
+module.exports = mongoose.model("ActivatedUser", ActivatedUserSchema);
