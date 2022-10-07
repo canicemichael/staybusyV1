@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 async function isUser(req, res, next) {
-  const decoded = await jwt.verify(req.headers.authtoken, "healthie");
+  const decoded = await jwt.verify(req.headers.authtoken, "canice");
 
   const user = await User.findOne({ _id: decoded.id });
 

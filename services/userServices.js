@@ -4,17 +4,12 @@ const User = require("../models/user");
 const CustomError = require("../helpers/CustomError");
 const config = require("../config/auth.config");
 const nodemailer = require("../config/nodemailer.config");
+const sesClient = require("../ses-client");
 
 class UsersService {
   async signupUser(data) {
     if (await User.findOne({ email: data.email }))
       throw new CustomError("email already exists");
-
-    // const user = new User({
-    //   email: req.body.email,
-    //   password: req.body.password,
-    //   confirmationCode: token,
-    // });
 
     const token = await jwt.sign({ email: data.email }, config.secret);
 
@@ -24,9 +19,17 @@ class UsersService {
       confirmationCode: token,
     });
 
-    await user.save(() => {
-      nodemailer.sendConfirmationEmail(user.email, user.confirmationCode);
-    });
+    await user.save();
+
+    // await user.save(() => {
+    //   nodemailer.sendConfirmationEmail(user.email, user.confirmationCode);
+    // });
+
+    sesClient.sendEmail(
+      "user@example.com",
+      "Hey! Welcome",
+      "This is the body of email"
+    );
 
     return token;
   }
