@@ -4,7 +4,7 @@ const User = require("../models/user");
 const CustomError = require("../helpers/CustomError");
 const config = require("../config/auth.config");
 const nodemailer = require("../config/nodemailer.config");
-const sesClient = require("../ses-client");
+const sesClient = require("../config/ses-client");
 
 class UsersService {
   async signupUser(data) {
@@ -19,19 +19,37 @@ class UsersService {
       confirmationCode: token,
     });
 
+    let confirmationCode = token;
+
     await user.save();
 
-    // await user.save(() => {
     //   nodemailer.sendConfirmationEmail(user.email, user.confirmationCode);
-    // });
 
     sesClient.sendEmail(
-      "user@example.com",
+      data.email,
       "Hey! Welcome",
-      "This is the body of email"
+      `<h1>Email Confirmation</h1>
+      <h2>Hello Pioneer</h2>
+      <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
+      <a href=http://localhost:8081/confirm/${confirmationCode}> Click here</a>
+      </div>`
     );
 
     return token;
+  }
+
+  async verifyUser(data, confirmationCode) {
+    let user = await User.findOne({
+      confirmationCode: confirmationCode,
+    });
+
+    if (!user) throw new CustomError("User dosen't exist", 404);
+
+    user.status = "Active";
+
+    await user.save();
+
+    return user;
   }
 
   async signinUser(data) {
@@ -42,6 +60,9 @@ class UsersService {
 
     if (!user) throw new CustomError("Incorrect email");
 
+    if (user.status != "Active")
+      throw new CustomError("Pending Account. Please Verify Your Email!", 401);
+
     const isCorrect = await bcrypt.compare(data.password, user.password);
 
     if (!isCorrect) throw new CustomError("Incorrect email or password");
@@ -49,16 +70,6 @@ class UsersService {
     const token = await jwt.sign({ id: user._id, role: "user" }, "canice");
 
     return token;
-  }
-
-  async getUsers() {
-    return await User.find({});
-  }
-
-  async getUser(userId) {
-    const user = await User.findOne({ _id: userId });
-    if (!user) throw new CustomError("User doesn't exist", 404); // if the ID used as parameter is invalid
-    return user;
   }
 
   async editUser(userId, data) {
@@ -69,10 +80,6 @@ class UsersService {
     if (!user) throw new CustomError("User dosen't exist", 404);
 
     return user;
-  }
-
-  async deleteUser(userId) {
-    return await User.findOneAndRemove({ _id: userId });
   }
 }
 module.exports = new UsersService();

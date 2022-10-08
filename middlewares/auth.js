@@ -19,11 +19,8 @@ async function isUser(req, res, next) {
 async function isActivated(req, res, next) {
   const user = await User.findOne({ _id: decoded.id });
 
-  if (user.status != "Active") {
-    return res.status(401).send({
-      message: "Pending Account. Please Verify Your Email!",
-    });
-  }
+  if (user.status != "Active")
+    throw new CustomError("Pending Account. Please Verify Your Email!", 401);
 }
 
 module.exports.isUser = isUser;

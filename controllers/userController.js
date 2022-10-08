@@ -1,36 +1,34 @@
 const {
   signupUser,
   signinUser,
-  getUsers,
-  getUser,
-  deleteUser,
   editUser,
+  verifyUser,
 } = require("../services/userServices");
 
 const { response } = require("../helpers/messages");
 const CustomError = require("../helpers/CustomError");
-const User = require("../models/user");
+const { User, validateUser } = require("../models/user");
 
 class UserContoller {
   async signupUser(req, res, next) {
+    const { error } = validateUser(req.body);
+
     const token = await signupUser(req.body);
+
     res.status(201).send(response("Email Sent", token));
   }
 
-  // async signinUser(req, res, next) {
-  //   const token = await signinUser(req.body);
-  //   res.status(200).send(response("User signed in", token));
-  // }
+  async verifyUser(req, res, next) {
+    const user = await verifyUser(req.params.confirmationCode, req.body);
 
-  // async getUsers(req, res, next) {
-  //   const users = await getUsers();
-  //   res.status(200).send(response("All users", users));
-  // }
+    if (req.params.confirmationCode != user.confirmationCode)
+      throw new CustomError("Invalid user", 401);
+  }
 
-  // async getUser(req, res, next) {
-  //   const user = await getUser(req.params.userId);
-  //   res.status(200).send(response("User detail", user));
-  // }
+  async signinUser(req, res, next) {
+    const token = await signinUser(req.body);
+    res.status(200).send(response("User signed in", token));
+  }
 
   // async editUser(req, res, next) {
   //   const user = await editUser(req.params.userId, req.body);
@@ -45,11 +43,6 @@ class UserContoller {
   //   if (req.params.userId != req.headers.user.id)
   //     throw new CustomError("Invalid user", 401);
   //   res.status(200).send(response("Profile edited", user));
-  // }
-
-  // async deleteUser(req, res, next) {
-  //   const user = await deleteUser(req.params.userId);
-  //   res.status(200).send(response("User deleted", user));
   // }
 }
 
