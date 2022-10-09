@@ -1,8 +1,9 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const config = require("../config/auth.config");
 
 async function isUser(req, res, next) {
-  const decoded = await jwt.verify(req.headers.authtoken, "canice");
+  const decoded = await jwt.verify(req.headers.authtoken, config.secret);
 
   const user = await User.findOne({ _id: decoded.id });
 

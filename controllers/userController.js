@@ -1,7 +1,7 @@
 const {
   signupUser,
   signinUser,
-  editUser,
+  updateUserProfile,
   verifyUser,
 } = require("../services/userServices");
 
@@ -19,7 +19,7 @@ class UserContoller {
   }
 
   async verifyUser(req, res, next) {
-    const user = await verifyUser(req.params.confirmationCode, req.body);
+    const user = await verifyUser(req.params.confirmationCode);
 
     if (req.params.confirmationCode != user.confirmationCode)
       throw new CustomError("Invalid user", 401);
@@ -30,20 +30,20 @@ class UserContoller {
     res.status(200).send(response("User signed in", token));
   }
 
-  // async editUser(req, res, next) {
-  //   const user = await editUser(req.params.userId, req.body);
-  //   // const user = await User.findByIdAndUpdate(
-  //   //   req.params.userId,
-  //   //   {
-  //   //     $set: req.body
-  //   //   },
-  //   //   { new: true }
-  //   // );
+  async updateUserProfile(req, res, next) {
+    const user = await updateUserProfile(req.params.userId, req.body);
+    // const user = await User.findByIdAndUpdate(
+    //   req.params.userId,
+    //   {
+    //     $set: req.body
+    //   },
+    //   { new: true }
+    // );
 
-  //   if (req.params.userId != req.headers.user.id)
-  //     throw new CustomError("Invalid user", 401);
-  //   res.status(200).send(response("Profile edited", user));
-  // }
+    if (req.params.userId != req.headers.user.id)
+      throw new CustomError("Invalid user", 401);
+    res.status(200).send(response("Profile edited", user));
+  }
 }
 
 module.exports = new UserContoller();

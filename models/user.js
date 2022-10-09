@@ -22,12 +22,40 @@ const UserSchema = new Schema(
       type: String,
       unique: true,
     },
-    role: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Role",
-      },
-    ],
+    fullname: {
+      type: String,
+    },
+    location: {
+      type: String,
+    },
+    alternative_email: {
+      type: String,
+    },
+    phone_number: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
+    prefered_currency: {
+      type: String,
+    },
+    city: {
+      type: String,
+    },
+    periodAvailable: {
+      type: String,
+    },
+    imgUrl: {
+      type: String,
+      default: "/uploads/defaultImg.png",
+    },
+    // role: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Role",
+    //   },
+    // ],
   },
   {
     timestamps: true,

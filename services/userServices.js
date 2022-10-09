@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const CustomError = require("../helpers/CustomError");
 const config = require("../config/auth.config");
-const nodemailer = require("../config/nodemailer.config");
+const { transporter } = require("../config/nodemailer.config");
 const sesClient = require("../config/ses-client");
 
 class UsersService {
@@ -21,24 +21,42 @@ class UsersService {
 
     let confirmationCode = token;
 
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
+
     await user.save();
 
     //   nodemailer.sendConfirmationEmail(user.email, user.confirmationCode);
 
-    sesClient.sendEmail(
-      data.email,
-      "Hey! Welcome",
-      `<h1>Email Confirmation</h1>
-      <h2>Hello Pioneer</h2>
-      <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
-      <a href=http://localhost:8081/confirm/${confirmationCode}> Click here</a>
-      </div>`
-    );
+    // sesClient.sendEmail(
+    //   data.email,
+    //   "Hey! Welcome",
+    //   `<h1>Email Confirmation</h1>
+    //   <h2>Hello Pioneer</h2>
+    //   <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
+    //   <a href=http://localhost:8081/confirm/${confirmationCode}> Click here</a>
+    //   </div>`
+    // );
+
+    var mailOptions = {
+      from: "canicemichael@gmail.com",
+      to: data.email,
+      subject: "Sending Email using Node.js",
+      html: `<div><h1>Email Confirmation</h1><h2>Hello Pioneer</h2><p>Thank you for subscribing. Please confirm your email by licking on the following link</p><a href=http://localhost:3030/api/users/confirm/${confirmationCode}> Click here</a></div>`,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    });
 
     return token;
   }
 
-  async verifyUser(data, confirmationCode) {
+  async verifyUser(confirmationCode) {
     let user = await User.findOne({
       confirmationCode: confirmationCode,
     });
@@ -67,12 +85,12 @@ class UsersService {
 
     if (!isCorrect) throw new CustomError("Incorrect email or password");
 
-    const token = await jwt.sign({ id: user._id, role: "user" }, "canice");
+    const token = jwt.sign({ id: user._id }, config.secret); //role : "user"
 
     return token;
   }
 
-  async editUser(userId, data) {
+  async updateUserProfile(userId, data) {
     const user = await User.findByIdAndUpdate({ _id: userId }, data, {
       new: true,
     });
