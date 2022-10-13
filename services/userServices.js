@@ -5,6 +5,7 @@ const CustomError = require("../helpers/CustomError");
 const config = require("../config/auth.config");
 const { transporter } = require("../config/nodemailer.config");
 const multer = require("multer");
+const ProfilePic = require("../models/profilePic");
 const sesClient = require("../config/ses-client");
 
 class UsersService {
@@ -99,16 +100,6 @@ class UsersService {
     if (!user) throw new CustomError("User dosen't exist", 404);
 
     return user;
-  }
-
-  async uploadDP() {
-    //Setting storage engine
-    const storageEngine = multer.diskStorage({
-      destination: "./images",
-      filename: (req, file, cb) => {
-        cb(null, `${Date.now()}--${file.originalname}`);
-      },
-    });
   }
 }
 module.exports = new UsersService();

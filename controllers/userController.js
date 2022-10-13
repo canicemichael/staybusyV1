@@ -8,6 +8,14 @@ const {
 const { response } = require("../helpers/messages");
 const CustomError = require("../helpers/CustomError");
 const { User, validateUser } = require("../models/user");
+const ProfilePic = require("../models/profilePic");
+const multer = require("multer");
+const Storage = multer.diskStorage({
+  destination: "uploads",
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
 
 class UserContoller {
   async signupUser(req, res, next) {
@@ -43,6 +51,34 @@ class UserContoller {
     if (req.params.userId != req.headers.user.id)
       throw new CustomError("Invalid user", 401);
     res.status(200).send(response("Profile edited", user));
+  }
+
+  async uploadDP(req, res, next) {
+    //Setting storage engine
+    const upload = multer({
+      storage: Storage,
+    }).single("testImage");
+
+    upload(req, res, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        const newProfile = new ProfilePic({
+          name: req.body.name,
+          image: {
+            data: req.file.filename,
+            contentType: "<image />png",
+          },
+        });
+        newProfile
+          .save()
+          .then(() => res.send("successfully uploadede"))
+          .catch((err) => {
+            console.log(err);
+            res.send("err " + err);
+          });
+      }
+    });
   }
 }
 

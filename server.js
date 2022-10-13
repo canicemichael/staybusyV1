@@ -1,6 +1,7 @@
 require("express-async-errors");
 const CustomError = require("./helpers/CustomError");
 const errorHandler = require("./middlewares/errorHandler");
+const multer = require("multer");
 
 const http = require("http");
 const app = require("express")();
@@ -21,6 +22,8 @@ app.use((req, res, next) => {
 });
 
 app.use(errorHandler);
+
+// storage of uploads
 
 server.listen(port, () => {
   console.log(`:: server listening on port ${port}`);

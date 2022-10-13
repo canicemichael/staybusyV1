@@ -4,6 +4,7 @@ const {
   verifyUser,
   signinUser,
   updateUserProfile,
+  uploadDP,
 } = require("../controllers/userController");
 const { isUser, isActivated } = require("../middlewares/auth");
 
@@ -12,6 +13,7 @@ module.exports = function () {
   router.get("/confirm/:confirmationCode", verifyUser);
   router.put("/:userId", updateUserProfile);
   router.post("/signin", signinUser);
+  router.post("/uploadDp", uploadDP);
 
   // router.get("/", getUsers);
   // router.get("/:userId", getUser);
