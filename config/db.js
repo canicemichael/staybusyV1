@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 const uri =
   "mongodb+srv://canice:canice@cluster0.o2wxihp.mongodb.net/?retryWrites=true&w=majority";
 
+// const uri =
+//   "mongodb+srv://canice:canice@cluster0.avnmehp.mongodb.net/?retryWrites=true&w=majority";
+
 const options = {
   useNewUrlParser: true,
   // useCreateIndex: true,

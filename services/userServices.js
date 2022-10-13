@@ -4,9 +4,7 @@ const User = require("../models/user");
 const CustomError = require("../helpers/CustomError");
 const config = require("../config/auth.config");
 const { transporter } = require("../config/nodemailer.config");
-const multer = require("multer");
-const ProfilePic = require("../models/profilePic");
-const sesClient = require("../config/ses-client");
+// const sesClient = require("../config/ses-client");
 
 class UsersService {
   async signupUser(data) {
@@ -44,7 +42,7 @@ class UsersService {
       from: "canicemichael@gmail.com",
       to: data.email,
       subject: "Sending Email using Node.js",
-      html: `<div><h1>Email Confirmation</h1><h2>Hello Pioneer</h2><p>Thank you for subscribing. Please confirm your email by licking on the following link</p><a href=http://localhost:3030/api/users/confirm/${confirmationCode}> Click here</a></div>`,
+      html: `<div><h1>Email Confirmation</h1><h2>Hello Pioneer</h2><p>Thank you for subscribing. Please verify your email by clicking on the following link</p><a href=http://localhost:3030/api/users/confirm/${confirmationCode}> Click here</a></div>`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
@@ -69,7 +67,7 @@ class UsersService {
 
     await user.save();
 
-    return user;
+    // return user;
   }
 
   async signinUser(data) {

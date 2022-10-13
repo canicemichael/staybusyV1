@@ -31,6 +31,7 @@ class UserContoller {
 
     if (req.params.confirmationCode != user.confirmationCode)
       throw new CustomError("Invalid user", 401);
+    next();
   }
 
   async signinUser(req, res, next) {
