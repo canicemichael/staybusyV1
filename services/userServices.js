@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
+const { User } = require("../models/user");
 const CustomError = require("../helpers/CustomError");
 const config = require("../config/auth.config");
 const { transporter } = require("../config/nodemailer.config");
@@ -11,7 +11,7 @@ class UsersService {
     if (await User.findOne({ email: data.email }))
       throw new CustomError("email already exists");
 
-    const token = await jwt.sign({ email: data.email }, config.secret);
+    const token = jwt.sign({ email: data.email }, config.secret);
 
     const user = new User({
       email: data.email,
@@ -82,6 +82,8 @@ class UsersService {
       throw new CustomError("Pending Account. Please Verify Your Email!", 401);
 
     const isCorrect = await bcrypt.compare(data.password, user.password);
+
+    // bcrypt.compare(req.body.password, user.password);
 
     if (!isCorrect) throw new CustomError("Incorrect email or password");
 

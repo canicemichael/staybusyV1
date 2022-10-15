@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require("bcrypt");
 const Joi = require("joi");
+const jwt = require("jsonwebtoken");
+const config = require("../config/auth.config");
 
 const UserSchema = new Schema(
   {
@@ -62,6 +64,14 @@ const UserSchema = new Schema(
   }
 );
 
+// UserSchema.methods.generateAuthToken = function () {
+//   const token = jwt.sign(
+//     { _id: this._id, isAdmin: this.isAdmin },
+//     config.secret
+//   );
+//   return token;
+// };
+
 UserSchema.pre("save", async function (next) {
   try {
     const saltRounds = 10;
@@ -72,6 +82,8 @@ UserSchema.pre("save", async function (next) {
   }
   next();
 });
+
+const User = mongoose.model("User", UserSchema);
 
 const validateUser = (data) => {
   const schema = Joi.object({
@@ -84,5 +96,5 @@ const validateUser = (data) => {
   return schema.validate(data);
 };
 
-module.exports = mongoose.model("Users", UserSchema);
+module.exports.User = User;
 module.exports.validateUser = validateUser;
